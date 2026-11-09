@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: tx-mkk-basis-notes:latest
+    image: tz-mkk-basis-notes:latest
     container_name: notes-app
     ports:
       - "${APP_PORT:-3000}:80"

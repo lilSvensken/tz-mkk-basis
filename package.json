@@ -1,5 +1,5 @@
 {
-  "name": "tx-mkk-basis-notes",
+  "name": "tz-mkk-basis-notes",
   "private": true,
   "type": "module",
   "description": "SPA-приложение заметок со списками задач (Nuxt 4, TypeScript, Pinia)",
