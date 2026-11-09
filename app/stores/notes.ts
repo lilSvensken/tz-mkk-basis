@@ -2,16 +2,10 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Note, NoteContent } from '~/types/note'
 import { createId } from '~/utils/id'
+import { cloneContent } from '~/utils/noteContent'
 import { loadNotes, NOTES_STORAGE_KEY, saveNotes } from '~/utils/notesStorage'
 
 export const SAVE_DELAY = 300
-
-export function cloneContent(content: NoteContent): NoteContent {
-  return {
-    title: content.title,
-    todos: content.todos.map(todo => ({ ...todo })),
-  }
-}
 
 export const useNotesStore = defineStore('notes', () => {
   const notes = ref<Note[]>([])
