@@ -135,6 +135,39 @@ describe('notes store', () => {
     expect(stored()).toHaveLength(1)
   })
 
+  it('reloads notes when another tab changes storage', () => {
+    const store = useNotesStore()
+    store.init()
+    const note = store.create(content)
+    store.flush()
+
+    saveNotes([])
+    window.dispatchEvent(new StorageEvent('storage', { key: NOTES_STORAGE_KEY }))
+    expect(store.getById(note.id)).toBeUndefined()
+  })
+
+  it('reloads when storage is cleared in another tab', () => {
+    const store = useNotesStore()
+    store.init()
+    store.create(content)
+    store.flush()
+
+    localStorage.clear()
+    window.dispatchEvent(new StorageEvent('storage', { key: null }))
+    expect(store.notes).toEqual([])
+  })
+
+  it('ignores storage events for other keys', () => {
+    const store = useNotesStore()
+    store.init()
+    store.create(content)
+    store.flush()
+
+    saveNotes([])
+    window.dispatchEvent(new StorageEvent('storage', { key: 'other' }))
+    expect(store.notes).toHaveLength(1)
+  })
+
   it('removal is persisted', () => {
     const store = useNotesStore()
     const note = store.create(content)

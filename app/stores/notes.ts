@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Note, NoteContent } from '~/types/note'
 import { createId } from '~/utils/id'
-import { loadNotes, saveNotes } from '~/utils/notesStorage'
+import { loadNotes, NOTES_STORAGE_KEY, saveNotes } from '~/utils/notesStorage'
 
 export const SAVE_DELAY = 300
 
@@ -82,11 +82,22 @@ export const useNotesStore = defineStore('notes', () => {
     if (document.visibilityState === 'hidden') flush()
   }
 
+  function onStorage(event: StorageEvent) {
+    if (event.key !== null && event.key !== NOTES_STORAGE_KEY) return
+    if (saveTimer) {
+      clearTimeout(saveTimer)
+      saveTimer = null
+    }
+    dirty = false
+    load()
+  }
+
   function init() {
     if (!loaded.value) load()
     if (listening || typeof window === 'undefined') return
     listening = true
     window.addEventListener('pagehide', flush)
+    window.addEventListener('storage', onStorage)
     document.addEventListener('visibilitychange', onVisibilityChange)
   }
 
@@ -95,6 +106,7 @@ export const useNotesStore = defineStore('notes', () => {
     if (!listening) return
     listening = false
     window.removeEventListener('pagehide', flush)
+    window.removeEventListener('storage', onStorage)
     document.removeEventListener('visibilitychange', onVisibilityChange)
   }
 
