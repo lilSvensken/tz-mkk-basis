@@ -1,0 +1,108 @@
+@use 'abstracts' as *;
+
+:root {
+  color-scheme: light dark;
+
+  --color-bg: #f6f7fb;
+  --color-surface: #ffffff;
+  --color-border: #e3e5ec;
+  --color-text: #1c1f2a;
+  --color-text-muted: #6b7183;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-on-primary: #ffffff;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-focus: #6366f1;
+  --color-overlay: rgb(15 18 30 / 50%);
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 6%), 0 1px 3px rgb(16 24 40 / 10%);
+  --shadow-modal: 0 20px 40px rgb(16 24 40 / 20%);
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #12141c;
+    --color-surface: #1b1e29;
+    --color-border: #2c3040;
+    --color-text: #e8eaf2;
+    --color-text-muted: #9aa0b4;
+    --color-primary: #818cf8;
+    --color-primary-hover: #a5b4fc;
+    --color-on-primary: #12141c;
+    --color-danger: #f87171;
+    --color-danger-hover: #fca5a5;
+    --color-focus: #a5b4fc;
+    --color-overlay: rgb(0 0 0 / 60%);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  margin-bottom: $space-4;
+  font-size: 1.5rem;
+  line-height: 1.25;
+
+  @include from($bp-md) {
+    font-size: 1.875rem;
+  }
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.container {
+  width: 100%;
+  max-width: $container-max;
+  margin-inline: auto;
+  padding-inline: $space-4;
+
+  @include from($bp-md) {
+    padding-inline: $space-6;
+  }
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
