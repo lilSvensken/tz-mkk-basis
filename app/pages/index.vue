@@ -25,6 +25,7 @@ async function removeNote(note: Note) {
         Заметки
       </h1>
       <UiButton
+        v-if="store.notes.length > 0"
         variant="primary"
         to="/notes/new"
       >
@@ -32,7 +33,23 @@ async function removeNote(note: Note) {
       </UiButton>
     </div>
 
-    <ul class="notes-page__list">
+    <EmptyState
+      v-if="store.notes.length === 0"
+      title="Заметок пока нет"
+      text="Создайте первую заметку и добавьте в неё список дел."
+    >
+      <UiButton
+        variant="primary"
+        to="/notes/new"
+      >
+        Создать заметку
+      </UiButton>
+    </EmptyState>
+
+    <ul
+      v-else
+      class="notes-page__list"
+    >
       <li
         v-for="note in store.sortedNotes"
         :key="note.id"
