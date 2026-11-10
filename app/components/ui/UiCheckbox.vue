@@ -31,9 +31,9 @@ const props = withDefaults(defineProps<{
         fill="none"
       >
         <path
-          d="M3.5 8.5l3 3 6-7"
+          d="M4.5 8.5l2.5 2.5 4.5-5.5"
           stroke="currentColor"
-          stroke-width="2"
+          stroke-width="2.2"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
@@ -54,6 +54,7 @@ const props = withDefaults(defineProps<{
   gap: $space-2;
   align-items: center;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 
   &--disabled {
     cursor: not-allowed;
@@ -64,8 +65,8 @@ const props = withDefaults(defineProps<{
     position: absolute;
     top: 0;
     left: 0;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     margin: 0;
     cursor: inherit;
     opacity: 0;
@@ -75,24 +76,27 @@ const props = withDefaults(defineProps<{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     color: transparent;
-    background: var(--color-surface);
-    border: 2px solid var(--color-text-muted);
-    border-radius: 5px;
-    transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast;
+    border: 1.5px solid var(--color-text-muted);
+    border-radius: 50%;
+    transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast, transform $transition-fast;
 
     svg {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
     }
   }
 
   &__input:checked + &__box {
-    color: var(--color-on-primary);
+    color: var(--color-check);
     background: var(--color-primary);
     border-color: var(--color-primary);
+  }
+
+  &__input:active + &__box {
+    transform: scale(0.9);
   }
 
   &__input:focus-visible + &__box {

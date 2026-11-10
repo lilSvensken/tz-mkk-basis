@@ -6,6 +6,27 @@
           to="/"
           class="app__logo"
         >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <rect
+              x="4"
+              y="3"
+              width="16"
+              height="18"
+              rx="4"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <path
+              d="M8 9h8M8 13h8M8 17h5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
           Заметки
         </NuxtLink>
       </div>
@@ -30,8 +51,9 @@
     position: sticky;
     top: 0;
     z-index: $z-header;
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bar);
+    border-bottom: 0.5px solid var(--color-border);
+    backdrop-filter: saturate(180%) blur(20px);
   }
 
   &__header-inner {
@@ -41,10 +63,19 @@
   }
 
   &__logo {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--color-text);
+    display: inline-flex;
+    gap: $space-2;
+    align-items: center;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--color-accent-text);
     text-decoration: none;
+    border-radius: $radius-sm;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
 
     @include focus-ring;
   }

@@ -43,37 +43,44 @@ const NuxtLink = resolveComponent('NuxtLink')
   gap: $space-2;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 $space-4;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  border: 1px solid transparent;
+  background: transparent;
+  border: 0;
   border-radius: $radius-sm;
-  transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast;
+  transition: background-color $transition-fast, color $transition-fast, opacity $transition-fast;
+  -webkit-tap-highlight-color: transparent;
 
   @include focus-ring;
 
   &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+    cursor: default;
+    opacity: 0.35;
+  }
+
+  &:active:not(:disabled) {
+    opacity: 0.6;
   }
 
   &--sm {
-    min-height: 32px;
+    min-height: 36px;
     padding: 0 $space-3;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
   }
 
   &--icon {
-    width: 40px;
+    width: 44px;
     padding: 0;
 
     &.ui-button--sm {
-      width: 32px;
+      width: 36px;
     }
   }
 
@@ -92,16 +99,15 @@ const NuxtLink = resolveComponent('NuxtLink')
 
   &--secondary {
     color: var(--color-text);
-    background: var(--color-surface);
-    border-color: var(--color-border);
+    background: var(--color-fill);
 
     &:hover:not(:disabled) {
-      border-color: var(--color-text-muted);
+      background: var(--color-border);
     }
   }
 
   &--danger {
-    color: var(--color-on-primary);
+    color: #ffffff;
     background: var(--color-danger);
 
     &:hover:not(:disabled) {
@@ -110,19 +116,17 @@ const NuxtLink = resolveComponent('NuxtLink')
   }
 
   &--ghost {
-    color: var(--color-text-muted);
-    background: transparent;
+    color: var(--color-accent-text);
 
     &:hover:not(:disabled) {
-      color: var(--color-text);
-      background: var(--color-bg);
+      background: var(--color-fill);
     }
   }
 
   :deep(svg) {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
   }
 }
 </style>

@@ -61,46 +61,43 @@ defineExpose({
 
   &__field {
     width: 100%;
-    min-height: 40px;
+    min-height: 44px;
     padding: $space-2 $space-3;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    caret-color: var(--color-primary);
+    background: var(--color-fill);
+    border: 0;
     border-radius: $radius-sm;
-    transition: border-color $transition-fast, box-shadow $transition-fast;
+    outline: none;
+    transition: background-color $transition-fast, box-shadow $transition-fast;
 
     &::placeholder {
       color: var(--color-text-muted);
-      opacity: 0.8;
+      opacity: 1;
     }
 
-    &:hover {
-      border-color: var(--color-text-muted);
-    }
-
-    &:focus {
-      border-color: var(--color-focus);
-      outline: none;
-      box-shadow: 0 0 0 3px rgb(99 102 241 / 25%);
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--color-focus);
     }
   }
 
   &--lg &__field {
-    min-height: 48px;
-    font-size: 1.25rem;
-    font-weight: 600;
+    min-height: 52px;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   &--plain &__field {
+    padding-inline: $space-2;
     background: transparent;
-    border-color: transparent;
 
     &:hover {
-      border-color: var(--color-border);
+      background: var(--color-bg);
     }
 
     &:focus {
-      background: var(--color-surface);
-      border-color: var(--color-focus);
+      background: var(--color-bg);
+      box-shadow: none;
     }
   }
 }

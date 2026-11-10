@@ -195,6 +195,7 @@ onBeforeUnmount(deactivate)
   padding: $space-4;
   overflow-y: auto;
   background: var(--color-overlay);
+  backdrop-filter: blur(2px);
 
   @include from($bp-sm) {
     align-items: center;
@@ -223,8 +224,9 @@ onBeforeUnmount(deactivate)
   }
 
   &__title {
-    font-size: 1.125rem;
-    line-height: 1.4;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    line-height: 1.35;
   }
 
   &__close {
@@ -236,17 +238,16 @@ onBeforeUnmount(deactivate)
     height: 32px;
     margin: -$space-1 (-$space-2) 0 0;
     padding: 0;
-    color: var(--color-text-muted);
+    color: var(--color-accent-text);
     cursor: pointer;
     background: transparent;
     border: 0;
-    border-radius: $radius-sm;
+    border-radius: 50%;
 
     @include focus-ring;
 
     &:hover {
-      color: var(--color-text);
-      background: var(--color-bg);
+      background: var(--color-fill);
     }
 
     svg {
@@ -256,7 +257,8 @@ onBeforeUnmount(deactivate)
   }
 
   &__body {
-    padding: $space-3 $space-5 0;
+    padding: $space-2 $space-5 0;
+    font-size: 0.9375rem;
     color: var(--color-text-muted);
   }
 
