@@ -15,7 +15,10 @@ async function removeNote(note: Note) {
     confirmText: 'Удалить',
     danger: true,
   })
-  if (ok) store.remove(note.id)
+  if (!ok) return
+  store.remove(note.id)
+  await nextTick()
+  document.querySelector<HTMLElement>('.note-card__link, .notes-page .ui-button--primary')?.focus()
 }
 </script>
 
