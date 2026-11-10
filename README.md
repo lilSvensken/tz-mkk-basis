@@ -2,6 +2,8 @@
 
 SPA для заметок с todo-списками. Nuxt 4, TypeScript, Pinia, SCSS, без UI-библиотек.
 
+Демо: https://lilsvensken.github.io/tz-mkk-basis/
+
 ## Запуск
 
 ```bash
