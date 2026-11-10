@@ -126,7 +126,10 @@ useEditorHotkeys({
   save: () => {
     if (isNew || isDirty.value) save()
   },
-}, () => !missing)
+}, {
+  enabled: () => !missing,
+  hasPendingInput: () => editor.hasPendingInput.value,
+})
 
 onBeforeUnmount(editor.dispose)
 </script>

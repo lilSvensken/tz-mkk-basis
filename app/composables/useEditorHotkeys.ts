@@ -1,10 +1,16 @@
 import { onBeforeUnmount, onMounted } from 'vue'
+import { isTextField } from '~/utils/focusable'
 import { hasOpenModal } from '~/utils/modalStack'
 
 export interface EditorHotkeys {
   undo: () => void
   redo: () => void
   save: () => void
+}
+
+export interface EditorHotkeysOptions {
+  enabled?: () => boolean
+  hasPendingInput?: () => boolean
 }
 
 export type HotkeyAction = keyof EditorHotkeys
@@ -17,11 +23,34 @@ export function matchHotkey(event: KeyboardEvent): HotkeyAction | null {
   return null
 }
 
-export function useEditorHotkeys(handlers: EditorHotkeys, enabled: () => boolean = () => true) {
+function readValue(target: EventTarget | null): string | null {
+  if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) return target.value
+  return null
+}
+
+export function useEditorHotkeys(handlers: EditorHotkeys, options: EditorHotkeysOptions = {}) {
+  function shouldUseNativeUndo(event: KeyboardEvent): boolean {
+    return isTextField(event.target)
+      && readValue(event.target) !== null
+      && (options.hasPendingInput?.() ?? false)
+  }
+
   function onKeydown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.isComposing || hasOpenModal.value || !enabled()) return
+    if (event.defaultPrevented || event.isComposing || hasOpenModal.value) return
+    if (options.enabled && !options.enabled()) return
+
     const action = matchHotkey(event)
     if (!action) return
+
+    if (action !== 'save' && shouldUseNativeUndo(event)) {
+      const target = event.target
+      const before = readValue(target)
+      setTimeout(() => {
+        if (readValue(target) === before) handlers[action]()
+      })
+      return
+    }
+
     event.preventDefault()
     handlers[action]()
   }
