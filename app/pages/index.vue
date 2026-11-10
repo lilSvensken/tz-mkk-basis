@@ -2,11 +2,17 @@
 import type { Note } from '~/types/note'
 import { useNotesStore } from '~/stores/notes'
 import { displayTitle } from '~/utils/noteContent'
+import { pluralize } from '~/utils/plural'
 
 const store = useNotesStore()
 const confirm = useConfirm()
 
 useHead({ title: 'Заметки' })
+
+const countLabel = computed(() => {
+  const count = store.notes.length
+  return `${count} ${pluralize(count, ['заметка', 'заметки', 'заметок'])}`
+})
 
 async function removeNote(note: Note) {
   const ok = await confirm({
@@ -18,21 +24,48 @@ async function removeNote(note: Note) {
   if (!ok) return
   store.remove(note.id)
   await nextTick()
-  document.querySelector<HTMLElement>('.note-card__link, .notes-page .ui-button--primary')?.focus()
+  document.querySelector<HTMLElement>('.note-card__link, .notes-page__new, .notes-page .ui-button--primary')?.focus()
 }
 </script>
 
 <template>
   <section class="notes-page">
     <div class="notes-page__head">
-      <h1 class="notes-page__title">
-        Заметки
-      </h1>
+      <div>
+        <h1 class="notes-page__title">
+          Заметки
+        </h1>
+        <p
+          v-if="store.notes.length > 0"
+          class="notes-page__count"
+        >
+          {{ countLabel }}
+        </p>
+      </div>
       <UiButton
         v-if="store.notes.length > 0"
-        variant="primary"
+        variant="ghost"
         to="/notes/new"
+        class="notes-page__new"
       >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M11 4H7a3 3 0 00-3 3v10a3 3 0 003 3h10a3 3 0 003-3v-4"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M17.5 3.5a2.1 2.1 0 013 3L13 14l-4 1 1-4 7.5-7.5z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+        </svg>
         Новая заметка
       </UiButton>
     </div>
@@ -88,13 +121,23 @@ async function removeNote(note: Note) {
     display: flex;
     flex-wrap: wrap;
     gap: $space-3;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     margin-bottom: $space-6;
   }
 
   &__title {
     margin: 0;
+  }
+
+  &__count {
+    margin-top: $space-1;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+  }
+
+  &__new {
+    margin-right: -$space-3;
   }
 
   &__list {

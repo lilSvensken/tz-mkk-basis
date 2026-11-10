@@ -85,7 +85,7 @@ defineExpose({
   display: flex;
   gap: $space-2;
   align-items: center;
-  padding-left: $space-2;
+  padding-left: $space-1;
 
   > .ui-input {
     flex: 1;
@@ -93,13 +93,14 @@ defineExpose({
 
   &--done :deep(.ui-input__field) {
     color: var(--color-text-muted);
-    text-decoration: line-through;
   }
 
   &__remove {
-    opacity: 0.6;
+    color: var(--color-text-muted);
+    opacity: 0;
 
-    &:hover,
+    .todo-row:hover &,
+    .todo-row:focus-within &,
     &:focus-visible {
       opacity: 1;
     }

@@ -51,7 +51,20 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
         <span
           class="note-card__mark"
           aria-hidden="true"
-        />
+        >
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+          >
+            <path
+              d="M4.5 8.5l2.5 2.5 4.5-5.5"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </span>
         <span class="visually-hidden">{{ todo.done ? 'Выполнено:' : 'Не выполнено:' }}</span>
         <span class="note-card__text">{{ todo.text }}</span>
       </li>
@@ -86,16 +99,16 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   flex-direction: column;
   gap: $space-2;
   height: 100%;
-  padding: $space-4 $space-5;
+  padding: $space-5 $space-5 $space-3;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: $radius-md;
+  border-radius: $radius-lg;
   box-shadow: var(--shadow-card);
-  transition: border-color $transition-fast;
+  transition: box-shadow $transition-base, transform $transition-base;
 
   @media (hover: hover) {
     &:hover {
-      border-color: var(--color-primary);
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
     }
   }
 
@@ -105,13 +118,14 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   }
 
   &__title {
-    font-size: 1.125rem;
-    line-height: 1.35;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.3;
     overflow-wrap: anywhere;
   }
 
   &__link {
-    color: var(--color-text);
+    color: var(--color-accent-text);
     text-decoration: none;
     outline: none;
 
@@ -136,36 +150,45 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   &__todos {
     display: flex;
     flex-direction: column;
-    gap: $space-1;
+    gap: $space-2;
     padding: 0;
-    margin: 0;
+    margin: $space-1 0 0;
     list-style: none;
   }
 
   &__todo {
     display: flex;
-    gap: $space-2;
+    gap: $space-3;
     align-items: center;
     min-width: 0;
     font-size: 0.9375rem;
 
     &--done .note-card__text {
       color: var(--color-text-muted);
-      text-decoration: line-through;
     }
 
     &--done .note-card__mark {
+      color: var(--color-check);
       background: var(--color-primary);
       border-color: var(--color-primary);
     }
   }
 
   &__mark {
+    display: inline-flex;
     flex-shrink: 0;
-    width: 12px;
-    height: 12px;
-    border: 2px solid var(--color-text-muted);
-    border-radius: 3px;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: transparent;
+    border: 1.5px solid var(--color-text-muted);
+    border-radius: 50%;
+
+    svg {
+      width: 13px;
+      height: 13px;
+    }
   }
 
   &__text {
@@ -182,10 +205,10 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
     position: relative;
     z-index: 1;
     display: flex;
-    gap: $space-2;
+    gap: $space-1;
     justify-content: flex-end;
+    margin: auto (-$space-2) 0 0;
     padding-top: $space-2;
-    margin-top: auto;
   }
 }
 </style>

@@ -23,6 +23,10 @@ const isDirty = computed(() => JSON.stringify(content) !== JSON.stringify(saved.
 const justCreated = useState<string | null>('note-just-created', () => null)
 const justSaved = ref(justCreated.value === noteId)
 justCreated.value = null
+const updatedAt = ref(initial?.updatedAt ?? null)
+const updatedLabel = computed(() => updatedAt.value
+  ? new Date(updatedAt.value).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  : '')
 let allowLeave = false
 
 useHead({
@@ -120,6 +124,7 @@ watch(() => (isNew || missing ? null : store.getById(noteId)), (note) => {
   const fresh = cloneContent(note)
   if (isDirty.value || JSON.stringify(fresh) === JSON.stringify(saved.value)) return
   saved.value = fresh
+  updatedAt.value = note.updatedAt
   editor.reset(fresh)
 })
 
@@ -152,6 +157,7 @@ function save() {
     return
   }
   saved.value = cloneContent(updated)
+  updatedAt.value = updated.updatedAt
   editor.reset(saved.value)
   justSaved.value = true
 }
@@ -238,28 +244,32 @@ onBeforeUnmount(editor.dispose)
       {{ isNew ? 'Новая заметка' : 'Редактирование заметки' }}
     </h1>
 
-    <div class="note-page__top">
+    <nav
+      class="note-page__bar"
+      aria-label="Действия с заметкой"
+    >
       <NuxtLink
         to="/"
         class="note-page__back"
       >
-        ← Все заметки
+        <svg
+          viewBox="0 0 12 20"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M10 2L2 10l8 8"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Заметки
       </NuxtLink>
       <div class="note-page__tools">
-        <p
-          class="note-page__status"
-          role="status"
-        >
-          <template v-if="isDirty">
-            Есть несохранённые изменения
-          </template>
-          <template v-else-if="justSaved">
-            Сохранено
-          </template>
-        </p>
         <UiButton
           variant="ghost"
-          size="sm"
           icon
           aria-label="Отменить действие"
           title="Отменить действие (Ctrl+Z)"
@@ -268,14 +278,14 @@ onBeforeUnmount(editor.dispose)
           @click="editor.undo"
         >
           <svg
-            viewBox="0 0 20 20"
+            viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
           >
             <path
-              d="M7 4L3 8l4 4M3 8h9a5 5 0 010 10H9"
+              d="M9 4L4 9l5 5M4 9h10a6 6 0 010 12h-3"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.9"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
@@ -283,7 +293,6 @@ onBeforeUnmount(editor.dispose)
         </UiButton>
         <UiButton
           variant="ghost"
-          size="sm"
           icon
           aria-label="Повторить действие"
           title="Повторить действие (Ctrl+Shift+Z)"
@@ -292,21 +301,46 @@ onBeforeUnmount(editor.dispose)
           @click="editor.redo"
         >
           <svg
-            viewBox="0 0 20 20"
+            viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"
           >
             <path
-              d="M13 4l4 4-4 4M17 8H8a5 5 0 000 10h3"
+              d="M15 4l5 5-5 5M20 9H10a6 6 0 000 12h3"
               stroke="currentColor"
-              stroke-width="1.8"
+              stroke-width="1.9"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>
         </UiButton>
+        <UiButton
+          variant="ghost"
+          class="note-page__done"
+          title="Сохранить (Ctrl+S)"
+          aria-keyshortcuts="Control+S"
+          :disabled="!isNew && !isDirty && !deletedElsewhere"
+          @click="save"
+        >
+          Готово
+        </UiButton>
       </div>
-    </div>
+    </nav>
+
+    <p
+      class="note-page__status"
+      role="status"
+    >
+      <template v-if="isDirty">
+        Есть несохранённые изменения
+      </template>
+      <template v-else-if="justSaved">
+        Сохранено
+      </template>
+      <template v-else-if="updatedLabel">
+        {{ updatedLabel }}
+      </template>
+    </p>
 
     <p
       v-if="deletedElsewhere"
@@ -358,24 +392,75 @@ onBeforeUnmount(editor.dispose)
       </UiButton>
     </div>
 
-    <div class="note-page__actions">
+    <div class="note-page__toolbar">
+      <UiButton
+        variant="ghost"
+        icon
+        aria-label="Добавить пункт"
+        title="Добавить пункт"
+        @click="addTodo()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <circle
+            cx="5.5"
+            cy="7"
+            r="3"
+            fill="currentColor"
+          />
+          <path
+            d="M4.2 7l.9.9 1.7-1.9"
+            stroke="var(--color-check)"
+            stroke-width="1.3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle
+            cx="5.5"
+            cy="17"
+            r="2.8"
+            stroke="currentColor"
+            stroke-width="1.6"
+          />
+          <path
+            d="M11 7h10M11 17h10"
+            stroke="currentColor"
+            stroke-width="1.9"
+            stroke-linecap="round"
+          />
+        </svg>
+      </UiButton>
       <UiButton
         v-if="!isNew && !deletedElsewhere"
         variant="ghost"
-        class="note-page__delete"
+        icon
+        aria-label="Удалить заметку"
+        title="Удалить заметку"
         @click="removeNote"
       >
-        Удалить
-      </UiButton>
-      <UiButton @click="cancel">
-        Отменить
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 7h16M10 4h4M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M10 11v6M14 11v6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </UiButton>
       <UiButton
-        variant="primary"
-        :disabled="!isNew && !isDirty && !deletedElsewhere"
-        @click="save"
+        variant="ghost"
+        class="note-page__cancel"
+        @click="cancel"
       >
-        Сохранить
+        Отменить
       </UiButton>
     </div>
 
@@ -426,63 +511,82 @@ onBeforeUnmount(editor.dispose)
 .note-page {
   display: flex;
   flex-direction: column;
-  gap: $space-4;
+  gap: $space-3;
   max-width: 720px;
+  min-height: calc(100dvh - 56px - #{$space-6});
   margin-inline: auto;
 
-  &__top {
+  @include from($bp-md) {
+    min-height: 0;
+  }
+
+  &__bar {
     display: flex;
-    flex-wrap: wrap;
-    gap: $space-2 $space-4;
+    gap: $space-2;
     align-items: center;
     justify-content: space-between;
+    margin-inline: -$space-2;
   }
 
   &__back {
-    color: var(--color-text-muted);
+    display: inline-flex;
+    gap: $space-2;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 $space-2;
+    font-size: 1.0625rem;
+    color: var(--color-accent-text);
     text-decoration: none;
     border-radius: $radius-sm;
 
     @include focus-ring;
 
-    &:hover {
-      color: var(--color-text);
+    &:active {
+      opacity: 0.6;
+    }
+
+    svg {
+      width: 11px;
+      height: 19px;
     }
   }
 
   &__tools {
     display: flex;
-    gap: $space-1;
     align-items: center;
+  }
+
+  &__done {
+    font-weight: 700;
   }
 
   &__status {
     min-height: 1.5em;
-    margin-right: $space-2;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: var(--color-text-muted);
+    text-align: center;
   }
 
   &__alert {
     padding: $space-3 $space-4;
+    font-size: 0.9375rem;
     color: var(--color-danger);
     background: var(--color-surface);
-    border: 1px solid currentcolor;
     border-radius: $radius-md;
+    box-shadow: inset 0 0 0 1px currentcolor;
   }
 
   &__card {
     display: flex;
     flex-direction: column;
-    gap: $space-3;
+    gap: $space-2;
     padding: $space-3;
     background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: $radius-md;
+    border-radius: $radius-lg;
     box-shadow: var(--shadow-card);
 
     @include from($bp-md) {
-      padding: $space-4 $space-5;
+      padding: $space-5 $space-6;
     }
   }
 
@@ -499,31 +603,31 @@ onBeforeUnmount(editor.dispose)
     align-self: flex-start;
   }
 
-  &__actions {
+  &__toolbar {
     position: sticky;
     bottom: 0;
     z-index: 1;
     display: flex;
-    flex-wrap: wrap;
     gap: $space-2;
-    justify-content: flex-end;
-    padding: $space-3 $space-4 calc(#{$space-3} + env(safe-area-inset-bottom));
-    margin: 0 (-$space-4) (-$space-6);
-    background: var(--color-bg);
-    border-top: 1px solid var(--color-border);
+    align-items: center;
+    padding: $space-2 $space-2 calc(#{$space-2} + env(safe-area-inset-bottom));
+    margin: auto (-$space-4) (-$space-6);
+    background: var(--color-bar);
+    border-top: 0.5px solid var(--color-border);
+    backdrop-filter: saturate(180%) blur(20px);
 
     @include from($bp-md) {
       position: static;
       padding: 0;
-      margin: 0;
+      margin: 0 (-$space-2);
       background: none;
       border: 0;
+      backdrop-filter: none;
     }
   }
 
-  &__delete {
-    margin-right: auto;
-    color: var(--color-danger);
+  &__cancel {
+    margin-left: auto;
   }
 }
 </style>
