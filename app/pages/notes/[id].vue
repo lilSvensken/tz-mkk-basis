@@ -23,7 +23,12 @@ const isDirty = computed(() => JSON.stringify(content) !== JSON.stringify(saved.
 const justSaved = ref(false)
 let allowLeave = false
 
-useHead({ title: () => isNew ? 'Новая заметка' : content.title || 'Заметка' })
+useHead({
+  title: () => {
+    if (missing) return 'Заметка не найдена'
+    return isNew ? 'Новая заметка' : content.title || 'Заметка'
+  },
+})
 
 watch(isDirty, (dirty) => {
   if (dirty) justSaved.value = false
@@ -47,7 +52,10 @@ function dismissDraft() {
 }
 
 onMounted(() => {
-  if (missing) return
+  if (missing) {
+    draft.stop()
+    return
+  }
   const found = loadDraft(noteId)
   if (!found) return
   if (JSON.stringify(found.content) === JSON.stringify(saved.value)) draft.discard()
@@ -164,15 +172,23 @@ onBeforeUnmount(editor.dispose)
 </script>
 
 <template>
-  <EmptyState
-    v-if="missing"
-    title="Заметка не найдена"
-    text="Возможно, она была удалена или ссылка неверная."
-  >
-    <UiButton to="/">
-      К списку заметок
-    </UiButton>
-  </EmptyState>
+  <section v-if="missing">
+    <h1>Заметка не найдена</h1>
+    <EmptyState
+      title="Такой заметки нет"
+      text="Возможно, она была удалена или в ссылке ошибка."
+    >
+      <UiButton to="/">
+        К списку заметок
+      </UiButton>
+      <UiButton
+        variant="primary"
+        to="/notes/new"
+      >
+        Создать заметку
+      </UiButton>
+    </EmptyState>
+  </section>
 
   <section
     v-else
