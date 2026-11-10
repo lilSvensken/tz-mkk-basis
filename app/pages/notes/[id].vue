@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NoteContent } from '~/types/note'
 import { useNotesStore } from '~/stores/notes'
+import { loadDraft, type Draft } from '~/utils/drafts'
 import { cloneContent } from '~/utils/noteContent'
 import { createNoteEditor } from '~/utils/noteEditor'
 
@@ -26,6 +27,31 @@ useHead({ title: () => isNew ? 'Новая заметка' : content.title || '�
 
 watch(isDirty, (dirty) => {
   if (dirty) justSaved.value = false
+})
+
+const draft = useNoteDraft(noteId, content, isDirty)
+const draftPrompt = shallowRef<Draft | null>(null)
+const draftTime = computed(() => draftPrompt.value
+  ? new Date(draftPrompt.value.savedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })
+  : '')
+
+function restoreDraft() {
+  const found = draftPrompt.value
+  draftPrompt.value = null
+  if (found) editor.reset(found.content)
+}
+
+function dismissDraft() {
+  draftPrompt.value = null
+  draft.discard()
+}
+
+onMounted(() => {
+  if (missing) return
+  const found = loadDraft(noteId)
+  if (!found) return
+  if (JSON.stringify(found.content) === JSON.stringify(saved.value)) draft.discard()
+  else draftPrompt.value = found
 })
 
 type Focusable = { focus: () => void }
@@ -67,6 +93,7 @@ function leave() {
 
 function save() {
   const next = editor.snapshot()
+  draft.discard()
 
   if (isNew) {
     const created = store.create(next)
@@ -93,6 +120,7 @@ async function cancel() {
     })
     if (!ok) return
   }
+  draft.stop()
   editor.reset(saved.value)
   await leave()
 }
@@ -105,6 +133,7 @@ async function removeNote() {
     danger: true,
   })
   if (!ok) return
+  draft.stop()
   store.remove(noteId)
   await leave()
 }
@@ -285,6 +314,26 @@ onBeforeUnmount(editor.dispose)
         Сохранить
       </UiButton>
     </div>
+
+    <UiModal
+      :open="draftPrompt !== null"
+      title="Восстановить черновик?"
+      @close="draftPrompt = null"
+    >
+      <p>Найдены несохранённые изменения от {{ draftTime }}. Восстановить их?</p>
+      <template #footer>
+        <UiButton @click="dismissDraft">
+          Не восстанавливать
+        </UiButton>
+        <UiButton
+          variant="primary"
+          data-autofocus
+          @click="restoreDraft"
+        >
+          Восстановить
+        </UiButton>
+      </template>
+    </UiModal>
   </section>
 </template>
 

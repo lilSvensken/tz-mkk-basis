@@ -9,11 +9,11 @@ type Migration = (data: StoredData) => StoredData
 
 const migrations: Record<number, Migration> = {}
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function isTodoItem(value: unknown): value is TodoItem {
+export function isTodoItem(value: unknown): value is TodoItem {
   return isRecord(value)
     && typeof value.id === 'string'
     && typeof value.text === 'string'
