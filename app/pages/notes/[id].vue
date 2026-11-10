@@ -99,19 +99,55 @@ function leave() {
   return router.push('/')
 }
 
-function save() {
-  const next = editor.snapshot()
-  draft.discard()
+const deletedElsewhere = ref(false)
+const deletedPrompt = ref(false)
+let removedHere = false
 
-  if (isNew) {
-    const created = store.create(next)
-    allowLeave = true
-    router.replace(`/notes/${created.id}`)
+function markDeleted() {
+  if (deletedElsewhere.value) return
+  deletedElsewhere.value = true
+  deletedPrompt.value = true
+}
+
+watch(() => (isNew || missing ? null : store.getById(noteId)), (note) => {
+  if (isNew || missing || removedHere) return
+  if (!note) {
+    markDeleted()
+    return
+  }
+  const fresh = cloneContent(note)
+  if (isDirty.value || JSON.stringify(fresh) === JSON.stringify(saved.value)) return
+  saved.value = fresh
+  editor.reset(fresh)
+})
+
+function saveAsNew() {
+  deletedPrompt.value = false
+  const created = store.create(editor.snapshot())
+  draft.stop()
+  allowLeave = true
+  router.replace(`/notes/${created.id}`)
+}
+
+async function closeDeleted() {
+  deletedPrompt.value = false
+  draft.stop()
+  await leave()
+}
+
+function save() {
+  if (isNew || deletedElsewhere.value) {
+    saveAsNew()
     return
   }
 
+  const next = editor.snapshot()
+  draft.discard()
   const updated = store.update(noteId, next)
-  if (!updated) return
+  if (!updated) {
+    markDeleted()
+    return
+  }
   saved.value = cloneContent(updated)
   editor.reset(saved.value)
   justSaved.value = true
@@ -141,6 +177,7 @@ async function removeNote() {
     danger: true,
   })
   if (!ok) return
+  removedHere = true
   draft.stop()
   store.remove(noteId)
   await leave()
@@ -161,7 +198,7 @@ useEditorHotkeys({
   undo: editor.undo,
   redo: editor.redo,
   save: () => {
-    if (isNew || isDirty.value) save()
+    if (isNew || isDirty.value || deletedElsewhere.value) save()
   },
 }, {
   enabled: () => !missing,
@@ -268,6 +305,14 @@ onBeforeUnmount(editor.dispose)
       </div>
     </div>
 
+    <p
+      v-if="deletedElsewhere"
+      class="note-page__alert"
+      role="alert"
+    >
+      Эта заметка удалена в другой вкладке. Сохранение создаст новую заметку.
+    </p>
+
     <div class="note-page__card">
       <UiInput
         :model-value="content.title"
@@ -312,7 +357,7 @@ onBeforeUnmount(editor.dispose)
 
     <div class="note-page__actions">
       <UiButton
-        v-if="!isNew"
+        v-if="!isNew && !deletedElsewhere"
         variant="ghost"
         class="note-page__delete"
         @click="removeNote"
@@ -324,7 +369,7 @@ onBeforeUnmount(editor.dispose)
       </UiButton>
       <UiButton
         variant="primary"
-        :disabled="!isNew && !isDirty"
+        :disabled="!isNew && !isDirty && !deletedElsewhere"
         @click="save"
       >
         Сохранить
@@ -347,6 +392,27 @@ onBeforeUnmount(editor.dispose)
           @click="restoreDraft"
         >
           Восстановить
+        </UiButton>
+      </template>
+    </UiModal>
+
+    <UiModal
+      :open="deletedPrompt"
+      title="Заметка удалена"
+      role="alertdialog"
+      @close="deletedPrompt = false"
+    >
+      <p>Эту заметку удалили в другой вкладке. Сохранить текущее содержимое как новую заметку?</p>
+      <template #footer>
+        <UiButton @click="closeDeleted">
+          Закрыть без сохранения
+        </UiButton>
+        <UiButton
+          variant="primary"
+          data-autofocus
+          @click="saveAsNew"
+        >
+          Сохранить как новую
         </UiButton>
       </template>
     </UiModal>
@@ -392,6 +458,14 @@ onBeforeUnmount(editor.dispose)
     margin-right: $space-2;
     font-size: 0.875rem;
     color: var(--color-text-muted);
+  }
+
+  &__alert {
+    padding: $space-3 $space-4;
+    color: var(--color-danger);
+    background: var(--color-surface);
+    border: 1px solid currentcolor;
+    border-radius: $radius-md;
   }
 
   &__card {
