@@ -25,9 +25,7 @@ useHead({ title: 'Заметки' })
         v-for="note in store.sortedNotes"
         :key="note.id"
       >
-        <NuxtLink :to="`/notes/${note.id}`">
-          {{ note.title }}
-        </NuxtLink>
+        <NoteCard :note="note" />
       </li>
     </ul>
   </section>
@@ -49,6 +47,9 @@ useHead({ title: 'Заметки' })
   }
 
   &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: $space-4;
     padding: 0;
     margin: 0;
     list-style: none;
