@@ -14,6 +14,8 @@
     <main class="app__main container">
       <NuxtPage />
     </main>
+
+    <ConfirmHost />
   </div>
 </template>
 
