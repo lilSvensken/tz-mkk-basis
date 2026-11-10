@@ -1,27 +1,6 @@
 <template>
   <div class="empty-state">
-    <svg
-      class="empty-state__icon"
-      viewBox="0 0 48 48"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect
-        x="10"
-        y="6"
-        width="28"
-        height="36"
-        rx="4"
-        stroke="currentColor"
-        stroke-width="2.5"
-      />
-      <path
-        d="M17 17h14M17 24h14M17 31h8"
-        stroke="currentColor"
-        stroke-width="2.5"
-        stroke-linecap="round"
-      />
-    </svg>
+    <IconNotes class="empty-state__icon" />
     <h2 class="empty-state__title">
       {{ props.title }}
     </h2>

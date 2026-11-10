@@ -37,18 +37,7 @@
           class="note-card__mark"
           aria-hidden="true"
         >
-          <svg
-            viewBox="0 0 16 16"
-            fill="none"
-          >
-            <path
-              d="M4.5 8.5l2.5 2.5 4.5-5.5"
-              stroke="currentColor"
-              stroke-width="2.2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <IconCheck />
         </span>
         <span class="visually-hidden">{{ todo.done ? 'Выполнено:' : 'Не выполнено:' }}</span>
         <span class="note-card__text">{{ todo.text }}</span>

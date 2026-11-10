@@ -28,18 +28,7 @@
       :aria-label="`Удалить пункт ${props.index + 1}`"
       @click="emit('remove')"
     >
-      <svg
-        viewBox="0 0 20 20"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M5 5l10 10M15 5L5 15"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-        />
-      </svg>
+      <IconClose />
     </UiButton>
   </li>
 </template>
