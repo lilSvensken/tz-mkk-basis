@@ -497,10 +497,25 @@ onBeforeUnmount(editor.dispose)
   }
 
   &__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
     display: flex;
     flex-wrap: wrap;
     gap: $space-2;
     justify-content: flex-end;
+    padding: $space-3 $space-4 calc(#{$space-3} + env(safe-area-inset-bottom));
+    margin: 0 (-$space-4) (-$space-6);
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+
+    @include from($bp-md) {
+      position: static;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: 0;
+    }
   }
 
   &__delete {

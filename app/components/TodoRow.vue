@@ -47,7 +47,6 @@ defineExpose({
     />
     <UiInput
       ref="input"
-      class="todo-row__input"
       :model-value="props.todo.text"
       :label="`Пункт ${props.index + 1}`"
       hide-label
@@ -88,7 +87,7 @@ defineExpose({
   align-items: center;
   padding-left: $space-2;
 
-  &__input {
+  > .ui-input {
     flex: 1;
   }
 
@@ -102,6 +101,12 @@ defineExpose({
 
     &:hover,
     &:focus-visible {
+      opacity: 1;
+    }
+
+    @media (hover: none) {
+      width: 40px;
+      min-height: 40px;
       opacity: 1;
     }
   }

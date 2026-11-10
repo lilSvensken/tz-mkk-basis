@@ -96,11 +96,15 @@ async function removeNote(note: Note) {
 
   &__list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: 1fr;
     gap: $space-4;
     padding: 0;
     margin: 0;
     list-style: none;
+
+    @include from($bp-sm) {
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
   }
 }
 </style>

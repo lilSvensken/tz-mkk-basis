@@ -93,8 +93,10 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   box-shadow: var(--shadow-card);
   transition: border-color $transition-fast;
 
-  &:hover {
-    border-color: var(--color-primary);
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-primary);
+    }
   }
 
   &:has(.note-card__link:focus-visible) {
