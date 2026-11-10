@@ -22,7 +22,6 @@
     />
     <UiButton
       variant="ghost"
-      size="sm"
       icon
       class="todo-row__remove"
       :aria-label="`Удалить пункт ${props.index + 1}`"
@@ -72,9 +71,9 @@ defineExpose({
 <style lang="scss" scoped>
 .todo-row {
   display: flex;
-  gap: $space-2;
+  gap: var(--space-2);
   align-items: center;
-  padding-left: $space-1;
+  padding-left: var(--space-1);
 
   > .ui-input {
     flex: 1;
@@ -89,14 +88,11 @@ defineExpose({
     opacity: 0;
 
     .todo-row:hover &,
-    .todo-row:focus-within &,
-    &:focus-visible {
+    .todo-row:focus-within & {
       opacity: 1;
     }
 
     @media (hover: none) {
-      width: 40px;
-      min-height: 40px;
       opacity: 1;
     }
   }

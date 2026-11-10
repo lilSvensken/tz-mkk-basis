@@ -177,11 +177,11 @@ onBeforeUnmount(deactivate)
 .ui-modal {
   position: fixed;
   inset: 0;
-  z-index: $z-modal;
+  z-index: var(--z-modal);
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: $space-4;
+  padding: var(--space-4);
   overflow-y: auto;
   background: var(--color-overlay);
   backdrop-filter: blur(2px);
@@ -192,10 +192,10 @@ onBeforeUnmount(deactivate)
 
   &__dialog {
     width: 100%;
-    max-width: 440px;
+    max-width: 27.5rem;
     margin: auto 0 0;
     background: var(--color-surface);
-    border-radius: $radius-lg;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-modal);
     outline: none;
 
@@ -206,14 +206,14 @@ onBeforeUnmount(deactivate)
 
   &__header {
     display: flex;
-    gap: $space-3;
+    gap: var(--space-3);
     align-items: flex-start;
     justify-content: space-between;
-    padding: $space-5 $space-5 0;
+    padding: var(--space-5) var(--space-5) 0;
   }
 
   &__title {
-    font-size: 1.1875rem;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     line-height: 1.35;
   }
@@ -223,39 +223,36 @@ onBeforeUnmount(deactivate)
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    margin: -$space-1 (-$space-2) 0 0;
+    --icon-size: 1.125rem;
+
+    width: var(--control-height-sm);
+    height: var(--control-height-sm);
+    margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2)) 0 0;
     padding: 0;
     color: var(--color-accent-text);
     cursor: pointer;
     background: transparent;
     border: 0;
-    border-radius: 50%;
+    border-radius: var(--radius-round);
 
     @include focus-ring;
 
     &:hover {
       background: var(--color-fill);
     }
-
-    svg {
-      width: 18px;
-      height: 18px;
-    }
   }
 
   &__body {
-    padding: $space-2 $space-5 0;
-    font-size: 0.9375rem;
+    padding: var(--space-2) var(--space-5) 0;
+    font-size: var(--font-size-md);
     color: var(--color-text-muted);
   }
 
   &__footer {
     display: flex;
     flex-direction: column-reverse;
-    gap: $space-2;
-    padding: $space-5;
+    gap: var(--space-2);
+    padding: var(--space-5);
 
     @include from($bp-sm) {
       flex-flow: row wrap;
@@ -266,10 +263,10 @@ onBeforeUnmount(deactivate)
 
 .ui-modal-enter-active,
 .ui-modal-leave-active {
-  transition: opacity $transition-base;
+  transition: opacity var(--transition-base);
 
   .ui-modal__dialog {
-    transition: transform $transition-base;
+    transition: transform var(--transition-base);
   }
 }
 

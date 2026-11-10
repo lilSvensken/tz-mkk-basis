@@ -30,36 +30,36 @@ const props = defineProps<{
 .empty-state {
   display: flex;
   flex-direction: column;
-  gap: $space-2;
+  gap: var(--space-2);
   align-items: center;
-  padding: $space-8 $space-4;
+  padding: var(--space-8) var(--space-4);
   text-align: center;
   background: var(--color-surface);
   border: 1px dashed var(--color-border);
-  border-radius: $radius-md;
+  border-radius: var(--radius-md);
 
   &__icon {
-    width: 48px;
-    height: 48px;
-    margin-bottom: $space-2;
+    --icon-size: 3rem;
+
+    margin-bottom: var(--space-2);
     color: var(--color-text-muted);
   }
 
   &__title {
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
   }
 
   &__text {
-    max-width: 360px;
+    max-width: 22.5rem;
     color: var(--color-text-muted);
   }
 
   &__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: $space-2;
+    gap: var(--space-2);
     justify-content: center;
-    margin-top: $space-3;
+    margin-top: var(--space-3);
   }
 }
 </style>

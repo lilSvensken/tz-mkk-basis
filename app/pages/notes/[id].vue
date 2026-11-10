@@ -1,5 +1,8 @@
 <template>
-  <section v-if="missing">
+  <section
+    v-if="missing"
+    class="note-missing"
+  >
     <h1>Заметка не найдена</h1>
     <EmptyState
       title="Такой заметки нет"
@@ -429,12 +432,18 @@ onBeforeUnmount(editor.dispose)
 </script>
 
 <style lang="scss" scoped>
+.note-missing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
 .note-page {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
-  max-width: 720px;
-  min-height: calc(100dvh - 56px - #{$space-6});
+  gap: var(--space-3);
+  max-width: var(--content-max);
+  min-height: calc(100dvh - var(--header-height) - var(--space-6));
   margin-inline: auto;
 
   @include from($bp-md) {
@@ -443,32 +452,29 @@ onBeforeUnmount(editor.dispose)
 
   &__bar {
     display: flex;
-    gap: $space-2;
+    gap: var(--space-2);
     align-items: center;
     justify-content: space-between;
-    margin-inline: -$space-2;
+    margin-inline: calc(-1 * var(--space-2));
   }
 
   &__back {
+    --icon-size: 1.25rem;
+
     display: inline-flex;
-    gap: $space-2;
+    gap: var(--space-1);
     align-items: center;
-    min-height: 44px;
-    padding: 0 $space-2;
-    font-size: 1.0625rem;
+    min-height: var(--control-height);
+    padding: 0 var(--space-2) 0 var(--space-1);
+    font-size: var(--font-size-base);
     color: var(--color-accent-text);
     text-decoration: none;
-    border-radius: $radius-sm;
+    border-radius: var(--radius-sm);
 
     @include focus-ring;
 
     &:active {
       opacity: 0.6;
-    }
-
-    svg {
-      width: 11px;
-      height: 19px;
     }
   }
 
@@ -482,39 +488,40 @@ onBeforeUnmount(editor.dispose)
   }
 
   &__status {
-    min-height: 1.5em;
-    font-size: 0.8125rem;
+    min-height: 1.25rem;
+    font-size: var(--font-size-xs);
+    line-height: 1.25rem;
     color: var(--color-text-muted);
     text-align: center;
   }
 
   &__alert {
-    padding: $space-3 $space-4;
-    font-size: 0.9375rem;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-md);
     color: var(--color-danger);
     background: var(--color-surface);
-    border-radius: $radius-md;
+    border-radius: var(--radius-md);
     box-shadow: inset 0 0 0 1px currentcolor;
   }
 
   &__card {
     display: flex;
     flex-direction: column;
-    gap: $space-2;
-    padding: $space-3;
+    gap: var(--space-2);
+    padding: var(--space-3);
     background: var(--color-surface);
-    border-radius: $radius-lg;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
 
     @include from($bp-md) {
-      padding: $space-5 $space-6;
+      padding: var(--space-5) var(--space-6);
     }
   }
 
   &__todos {
     display: flex;
     flex-direction: column;
-    gap: $space-1;
+    gap: var(--space-1);
     padding: 0;
     margin: 0;
     list-style: none;
@@ -529,10 +536,10 @@ onBeforeUnmount(editor.dispose)
     bottom: 0;
     z-index: 1;
     display: flex;
-    gap: $space-2;
+    gap: var(--space-2);
     align-items: center;
-    padding: $space-2 $space-2 calc(#{$space-2} + env(safe-area-inset-bottom));
-    margin: auto (-$space-4) (-$space-6);
+    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+    margin: auto calc(-1 * var(--space-4)) calc(-1 * var(--space-6));
     background: var(--color-bar);
     border-top: 0.5px solid var(--color-border);
     backdrop-filter: saturate(180%) blur(20px);
@@ -540,7 +547,7 @@ onBeforeUnmount(editor.dispose)
     @include from($bp-md) {
       position: static;
       padding: 0;
-      margin: 0 (-$space-2);
+      margin: 0 calc(-1 * var(--space-2));
       background: none;
       border: 0;
       backdrop-filter: none;

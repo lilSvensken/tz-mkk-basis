@@ -37,10 +37,12 @@ const props = withDefaults(defineProps<{
 
 <style lang="scss" scoped>
 .ui-checkbox {
+  --checkbox-size: 1.5rem;
+
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
-  gap: $space-2;
+  gap: var(--space-2);
   align-items: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -54,28 +56,25 @@ const props = withDefaults(defineProps<{
     position: absolute;
     top: 0;
     left: 0;
-    width: 24px;
-    height: 24px;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
     margin: 0;
     cursor: inherit;
     opacity: 0;
   }
 
   &__box {
+    --icon-size: 1rem;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
     color: transparent;
     border: 1.5px solid var(--color-text-muted);
-    border-radius: 50%;
-    transition: background-color $transition-fast, border-color $transition-fast, color $transition-fast, transform $transition-fast;
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
+    border-radius: var(--radius-round);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
   }
 
   &__input:checked + &__box {
@@ -89,8 +88,7 @@ const props = withDefaults(defineProps<{
   }
 
   &__input:focus-visible + &__box {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
+    @include focus-outline;
   }
 
   &:hover &__input:not(:disabled, :checked) + &__box {

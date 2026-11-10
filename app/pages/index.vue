@@ -103,37 +103,29 @@ async function removeNote(note: Note) {
   &__head {
     display: flex;
     flex-wrap: wrap;
-    gap: $space-3;
+    gap: var(--space-3);
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: $space-6;
-  }
-
-  &__title {
-    margin: 0;
+    margin-bottom: var(--space-6);
   }
 
   &__count {
-    margin-top: $space-1;
-    font-size: 0.9375rem;
+    margin-top: var(--space-1);
+    font-size: var(--font-size-md);
     color: var(--color-text-muted);
   }
 
   &__new {
-    margin-right: -$space-3;
+    margin-right: calc(-1 * var(--space-3));
   }
 
   &__list {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: $space-4;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16.25rem), 1fr));
+    gap: var(--space-4);
     padding: 0;
     margin: 0;
     list-style: none;
-
-    @include from($bp-sm) {
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    }
   }
 }
 </style>

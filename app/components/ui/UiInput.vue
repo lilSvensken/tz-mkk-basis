@@ -51,24 +51,24 @@ defineExpose({
 .ui-input {
   display: flex;
   flex-direction: column;
-  gap: $space-1;
+  gap: var(--space-1);
   min-width: 0;
 
   &__label {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     color: var(--color-text-muted);
   }
 
   &__field {
     width: 100%;
-    min-height: 44px;
-    padding: $space-2 $space-3;
+    min-height: var(--control-height);
+    padding: var(--space-2) var(--space-3);
     caret-color: var(--color-primary);
     background: var(--color-fill);
     border: 0;
-    border-radius: $radius-sm;
+    border-radius: var(--radius-sm);
     outline: none;
-    transition: background-color $transition-fast, box-shadow $transition-fast;
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
 
     &::placeholder {
       color: var(--color-text-muted);
@@ -81,14 +81,14 @@ defineExpose({
   }
 
   &--lg &__field {
-    min-height: 52px;
-    font-size: 1.75rem;
+    min-height: 3.25rem;
+    font-size: var(--font-size-xl);
     font-weight: 700;
     letter-spacing: -0.01em;
   }
 
   &--plain &__field {
-    padding-inline: $space-2;
+    padding-inline: var(--space-2);
     background: transparent;
 
     &:hover {

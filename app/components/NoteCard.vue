@@ -86,13 +86,13 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: $space-2;
+  gap: var(--space-2);
   height: 100%;
-  padding: $space-5 $space-5 $space-3;
+  padding: var(--space-5) var(--space-5) var(--space-3);
   background: var(--color-surface);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  transition: box-shadow $transition-base, transform $transition-base;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
 
   @media (hover: hover) {
     &:hover {
@@ -102,12 +102,11 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   }
 
   &:has(.note-card__link:focus-visible) {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
+    @include focus-outline;
   }
 
   &__title {
-    font-size: 1.25rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
     line-height: 1.3;
     overflow-wrap: anywhere;
@@ -132,25 +131,25 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
   }
 
   &__progress {
-    font-size: 0.8125rem;
+    font-size: var(--font-size-xs);
     color: var(--color-text-muted);
   }
 
   &__todos {
     display: flex;
     flex-direction: column;
-    gap: $space-2;
+    gap: var(--space-2);
     padding: 0;
-    margin: $space-1 0 0;
+    margin: var(--space-1) 0 0;
     list-style: none;
   }
 
   &__todo {
     display: flex;
-    gap: $space-3;
+    gap: var(--space-3);
     align-items: center;
     min-width: 0;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-md);
 
     &--done .note-card__text {
       color: var(--color-text-muted);
@@ -168,16 +167,13 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
+    --icon-size: 0.8125rem;
+
+    width: 1.25rem;
+    height: 1.25rem;
     color: transparent;
     border: 1.5px solid var(--color-text-muted);
-    border-radius: 50%;
-
-    svg {
-      width: 13px;
-      height: 13px;
-    }
+    border-radius: var(--radius-round);
   }
 
   &__text {
@@ -186,7 +182,7 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
 
   &__empty,
   &__more {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     color: var(--color-text-muted);
   }
 
@@ -194,10 +190,10 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
     position: relative;
     z-index: 1;
     display: flex;
-    gap: $space-1;
+    gap: var(--space-1);
     justify-content: flex-end;
-    margin: auto (-$space-2) 0 0;
-    padding-top: $space-2;
+    margin: auto calc(-1 * var(--space-2)) 0 0;
+    padding-top: var(--space-2);
   }
 }
 </style>

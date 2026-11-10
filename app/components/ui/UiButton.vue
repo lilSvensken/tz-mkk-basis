@@ -40,12 +40,12 @@ const NuxtLink = resolveComponent('NuxtLink')
 .ui-button {
   display: inline-flex;
   flex-shrink: 0;
-  gap: $space-2;
+  gap: var(--space-2);
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 0 $space-4;
-  font-size: 1rem;
+  min-height: var(--control-height);
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-base);
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -54,8 +54,8 @@ const NuxtLink = resolveComponent('NuxtLink')
   user-select: none;
   background: transparent;
   border: 0;
-  border-radius: $radius-sm;
-  transition: background-color $transition-fast, color $transition-fast, opacity $transition-fast;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
 
   @include focus-ring;
@@ -70,18 +70,18 @@ const NuxtLink = resolveComponent('NuxtLink')
   }
 
   &--sm {
-    min-height: 36px;
-    padding: 0 $space-3;
-    font-size: 0.9375rem;
+    min-height: var(--control-height-sm);
+    padding: 0 var(--space-3);
+    font-size: var(--font-size-md);
   }
 
   &--icon {
-    width: 44px;
+    width: var(--control-height);
     padding: 0;
+  }
 
-    &.ui-button--sm {
-      width: 36px;
-    }
+  &--icon#{&}--sm {
+    width: var(--control-height-sm);
   }
 
   &--block {
@@ -107,7 +107,7 @@ const NuxtLink = resolveComponent('NuxtLink')
   }
 
   &--danger {
-    color: #ffffff;
+    color: var(--color-on-danger);
     background: var(--color-danger);
 
     &:hover:not(:disabled) {
@@ -121,12 +121,6 @@ const NuxtLink = resolveComponent('NuxtLink')
     &:hover:not(:disabled) {
       background: var(--color-fill);
     }
-  }
-
-  :deep(svg) {
-    flex-shrink: 0;
-    width: 22px;
-    height: 22px;
   }
 }
 </style>

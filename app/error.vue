@@ -26,6 +26,6 @@ useHead({ title: () => notFound.value ? 'Страница не найдена' :
 
 <style lang="scss" scoped>
 .error-page {
-  padding-block: $space-8;
+  padding-block: var(--space-8);
 }
 </style>
