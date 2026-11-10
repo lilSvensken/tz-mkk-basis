@@ -28,6 +28,38 @@ watch(isDirty, (dirty) => {
   if (dirty) justSaved.value = false
 })
 
+type Focusable = { focus: () => void }
+
+const rows = new Map<string, Focusable>()
+const addButton = ref<{ $el: HTMLElement } | null>(null)
+
+function setRow(id: string, row: unknown) {
+  if (row) rows.set(id, row as Focusable)
+  else rows.delete(id)
+}
+
+async function focusTodo(id: string | undefined) {
+  await nextTick()
+  const row = id ? rows.get(id) : undefined
+  if (row) row.focus()
+  else addButton.value?.$el.focus()
+}
+
+function addTodo(index?: number) {
+  const todo = editor.addTodo(index)
+  focusTodo(todo.id)
+}
+
+function removeTodo(index: number, focusPrevious: boolean) {
+  const todo = content.todos[index]
+  if (!todo) return
+  editor.removeTodo(todo.id)
+  const next = focusPrevious
+    ? content.todos[index - 1] ?? content.todos[index]
+    : content.todos[index] ?? content.todos[index - 1]
+  focusTodo(next?.id)
+}
+
 function leave() {
   allowLeave = true
   return router.push('/')
@@ -142,14 +174,34 @@ onBeforeUnmount(editor.dispose)
         @blur="editor.commit"
       />
 
-      <ul class="note-page__todos">
-        <li
-          v-for="todo in content.todos"
+      <ul
+        v-if="content.todos.length > 0"
+        class="note-page__todos"
+        aria-label="Список дел"
+      >
+        <TodoRow
+          v-for="(todo, index) in content.todos"
           :key="todo.id"
-        >
-          {{ todo.text }}
-        </li>
+          :ref="(row) => setRow(todo.id, row)"
+          :todo="todo"
+          :index="index"
+          @toggle="editor.toggleTodo(todo.id)"
+          @update:text="editor.setTodoText(todo.id, $event)"
+          @commit="editor.commit"
+          @remove="removeTodo(index, false)"
+          @remove-empty="removeTodo(index, true)"
+          @enter="addTodo(index + 1)"
+        />
       </ul>
+
+      <UiButton
+        ref="addButton"
+        variant="ghost"
+        class="note-page__add"
+        @click="addTodo()"
+      >
+        + Добавить пункт
+      </UiButton>
     </div>
 
     <div class="note-page__actions">
@@ -225,9 +277,16 @@ onBeforeUnmount(editor.dispose)
   }
 
   &__todos {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
     padding: 0;
     margin: 0;
     list-style: none;
+  }
+
+  &__add {
+    align-self: flex-start;
   }
 
   &__actions {
