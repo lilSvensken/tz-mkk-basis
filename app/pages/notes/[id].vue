@@ -1,222 +1,3 @@
-<script setup lang="ts">
-import type { NoteContent } from '~/types/note'
-import { useNotesStore } from '~/stores/notes'
-import { loadDraft, type Draft } from '~/utils/drafts'
-import { cloneContent, displayTitle } from '~/utils/noteContent'
-import { createNoteEditor } from '~/utils/noteEditor'
-
-const route = useRoute()
-const router = useRouter()
-const store = useNotesStore()
-const confirm = useConfirm()
-
-const noteId = String(route.params.id)
-const isNew = noteId === 'new'
-const initial = isNew ? undefined : store.getById(noteId)
-const missing = !isNew && !initial
-
-const saved = shallowRef<NoteContent>(cloneContent(initial ?? { title: '', todos: [] }))
-const editor = createNoteEditor(saved.value)
-const content = editor.content
-
-const isDirty = computed(() => JSON.stringify(content) !== JSON.stringify(saved.value))
-const justCreated = useState<string | null>('note-just-created', () => null)
-const justSaved = ref(justCreated.value === noteId)
-justCreated.value = null
-const updatedAt = ref(initial?.updatedAt ?? null)
-const updatedLabel = computed(() => updatedAt.value
-  ? new Date(updatedAt.value).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-  : '')
-let allowLeave = false
-
-useHead({
-  title: () => {
-    if (missing) return 'Заметка не найдена'
-    return isNew && !content.title.trim() ? 'Новая заметка' : displayTitle(content.title)
-  },
-})
-
-watch(isDirty, (dirty) => {
-  if (dirty) justSaved.value = false
-})
-
-const draft = useNoteDraft(noteId, content, isDirty)
-const draftPrompt = shallowRef<Draft | null>(null)
-const draftTime = computed(() => draftPrompt.value
-  ? new Date(draftPrompt.value.savedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })
-  : '')
-
-function restoreDraft() {
-  const found = draftPrompt.value
-  draftPrompt.value = null
-  if (found) editor.reset(found.content)
-}
-
-function dismissDraft() {
-  draftPrompt.value = null
-  draft.discard()
-}
-
-onMounted(() => {
-  if (missing) {
-    draft.stop()
-    return
-  }
-  const found = loadDraft(noteId)
-  if (!found) return
-  if (JSON.stringify(found.content) === JSON.stringify(saved.value)) draft.discard()
-  else draftPrompt.value = found
-})
-
-type Focusable = { focus: () => void }
-
-const rows = new Map<string, Focusable>()
-const addButton = ref<{ $el: HTMLElement } | null>(null)
-
-function setRow(id: string, row: unknown) {
-  if (row) rows.set(id, row as Focusable)
-  else rows.delete(id)
-}
-
-async function focusTodo(id: string | undefined) {
-  await nextTick()
-  const row = id ? rows.get(id) : undefined
-  if (row) row.focus()
-  else addButton.value?.$el.focus()
-}
-
-function addTodo(index?: number) {
-  const todo = editor.addTodo(index)
-  focusTodo(todo.id)
-}
-
-function removeTodo(index: number, focusPrevious: boolean) {
-  const todo = content.todos[index]
-  if (!todo) return
-  editor.removeTodo(todo.id)
-  const next = focusPrevious
-    ? content.todos[index - 1] ?? content.todos[index]
-    : content.todos[index] ?? content.todos[index - 1]
-  focusTodo(next?.id)
-}
-
-function leave() {
-  allowLeave = true
-  return router.push('/')
-}
-
-const deletedElsewhere = ref(false)
-const deletedPrompt = ref(false)
-let removedHere = false
-
-function markDeleted() {
-  if (deletedElsewhere.value) return
-  deletedElsewhere.value = true
-  deletedPrompt.value = true
-}
-
-watch(() => (isNew || missing ? null : store.getById(noteId)), (note) => {
-  if (isNew || missing || removedHere) return
-  if (!note) {
-    markDeleted()
-    return
-  }
-  const fresh = cloneContent(note)
-  if (isDirty.value || JSON.stringify(fresh) === JSON.stringify(saved.value)) return
-  saved.value = fresh
-  updatedAt.value = note.updatedAt
-  editor.reset(fresh)
-})
-
-function saveAsNew() {
-  deletedPrompt.value = false
-  const created = store.create(editor.snapshot())
-  draft.stop()
-  allowLeave = true
-  justCreated.value = created.id
-  router.replace(`/notes/${created.id}`)
-}
-
-async function closeDeleted() {
-  deletedPrompt.value = false
-  draft.stop()
-  await leave()
-}
-
-function save() {
-  if (isNew || deletedElsewhere.value) {
-    saveAsNew()
-    return
-  }
-
-  const next = editor.snapshot()
-  draft.discard()
-  const updated = store.update(noteId, next)
-  if (!updated) {
-    markDeleted()
-    return
-  }
-  saved.value = cloneContent(updated)
-  updatedAt.value = updated.updatedAt
-  editor.reset(saved.value)
-  justSaved.value = true
-}
-
-async function cancel() {
-  if (isDirty.value) {
-    const ok = await confirm({
-      title: 'Отменить изменения?',
-      message: 'Все несохранённые изменения будут потеряны.',
-      confirmText: 'Отменить изменения',
-      cancelText: 'Продолжить',
-      danger: true,
-    })
-    if (!ok) return
-  }
-  draft.stop()
-  editor.reset(saved.value)
-  await leave()
-}
-
-async function removeNote() {
-  const ok = await confirm({
-    title: 'Удалить заметку?',
-    message: 'Заметка будет удалена без возможности восстановления.',
-    confirmText: 'Удалить',
-    danger: true,
-  })
-  if (!ok) return
-  removedHere = true
-  draft.stop()
-  store.remove(noteId)
-  await leave()
-}
-
-onBeforeRouteLeave(async () => {
-  if (allowLeave || missing || !isDirty.value) return true
-  return confirm({
-    title: 'Уйти без сохранения?',
-    message: 'Несохранённые изменения будут потеряны.',
-    confirmText: 'Уйти',
-    cancelText: 'Остаться',
-    danger: true,
-  })
-})
-
-useEditorHotkeys({
-  undo: editor.undo,
-  redo: editor.redo,
-  save: () => {
-    if (isNew || isDirty.value || deletedElsewhere.value) save()
-  },
-}, {
-  enabled: () => !missing,
-  hasPendingInput: () => editor.hasPendingInput.value,
-})
-
-onBeforeUnmount(editor.dispose)
-</script>
-
 <template>
   <section v-if="missing">
     <h1>Заметка не найдена</h1>
@@ -506,6 +287,225 @@ onBeforeUnmount(editor.dispose)
     </UiModal>
   </section>
 </template>
+
+<script setup lang="ts">
+import type { NoteContent } from '~/types/note'
+import { useNotesStore } from '~/stores/notes'
+import { loadDraft, type Draft } from '~/utils/drafts'
+import { cloneContent, displayTitle } from '~/utils/noteContent'
+import { createNoteEditor } from '~/utils/noteEditor'
+
+const route = useRoute()
+const router = useRouter()
+const store = useNotesStore()
+const confirm = useConfirm()
+
+const noteId = String(route.params.id)
+const isNew = noteId === 'new'
+const initial = isNew ? undefined : store.getById(noteId)
+const missing = !isNew && !initial
+
+const saved = shallowRef<NoteContent>(cloneContent(initial ?? { title: '', todos: [] }))
+const editor = createNoteEditor(saved.value)
+const content = editor.content
+
+const isDirty = computed(() => JSON.stringify(content) !== JSON.stringify(saved.value))
+const justCreated = useState<string | null>('note-just-created', () => null)
+const justSaved = ref(justCreated.value === noteId)
+justCreated.value = null
+const updatedAt = ref(initial?.updatedAt ?? null)
+const updatedLabel = computed(() => updatedAt.value
+  ? new Date(updatedAt.value).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  : '')
+let allowLeave = false
+
+useHead({
+  title: () => {
+    if (missing) return 'Заметка не найдена'
+    return isNew && !content.title.trim() ? 'Новая заметка' : displayTitle(content.title)
+  },
+})
+
+watch(isDirty, (dirty) => {
+  if (dirty) justSaved.value = false
+})
+
+const draft = useNoteDraft(noteId, content, isDirty)
+const draftPrompt = shallowRef<Draft | null>(null)
+const draftTime = computed(() => draftPrompt.value
+  ? new Date(draftPrompt.value.savedAt).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })
+  : '')
+
+function restoreDraft() {
+  const found = draftPrompt.value
+  draftPrompt.value = null
+  if (found) editor.reset(found.content)
+}
+
+function dismissDraft() {
+  draftPrompt.value = null
+  draft.discard()
+}
+
+onMounted(() => {
+  if (missing) {
+    draft.stop()
+    return
+  }
+  const found = loadDraft(noteId)
+  if (!found) return
+  if (JSON.stringify(found.content) === JSON.stringify(saved.value)) draft.discard()
+  else draftPrompt.value = found
+})
+
+type Focusable = { focus: () => void }
+
+const rows = new Map<string, Focusable>()
+const addButton = ref<{ $el: HTMLElement } | null>(null)
+
+function setRow(id: string, row: unknown) {
+  if (row) rows.set(id, row as Focusable)
+  else rows.delete(id)
+}
+
+async function focusTodo(id: string | undefined) {
+  await nextTick()
+  const row = id ? rows.get(id) : undefined
+  if (row) row.focus()
+  else addButton.value?.$el.focus()
+}
+
+function addTodo(index?: number) {
+  const todo = editor.addTodo(index)
+  focusTodo(todo.id)
+}
+
+function removeTodo(index: number, focusPrevious: boolean) {
+  const todo = content.todos[index]
+  if (!todo) return
+  editor.removeTodo(todo.id)
+  const next = focusPrevious
+    ? content.todos[index - 1] ?? content.todos[index]
+    : content.todos[index] ?? content.todos[index - 1]
+  focusTodo(next?.id)
+}
+
+function leave() {
+  allowLeave = true
+  return router.push('/')
+}
+
+const deletedElsewhere = ref(false)
+const deletedPrompt = ref(false)
+let removedHere = false
+
+function markDeleted() {
+  if (deletedElsewhere.value) return
+  deletedElsewhere.value = true
+  deletedPrompt.value = true
+}
+
+watch(() => (isNew || missing ? null : store.getById(noteId)), (note) => {
+  if (isNew || missing || removedHere) return
+  if (!note) {
+    markDeleted()
+    return
+  }
+  const fresh = cloneContent(note)
+  if (isDirty.value || JSON.stringify(fresh) === JSON.stringify(saved.value)) return
+  saved.value = fresh
+  updatedAt.value = note.updatedAt
+  editor.reset(fresh)
+})
+
+function saveAsNew() {
+  deletedPrompt.value = false
+  const created = store.create(editor.snapshot())
+  draft.stop()
+  allowLeave = true
+  justCreated.value = created.id
+  router.replace(`/notes/${created.id}`)
+}
+
+async function closeDeleted() {
+  deletedPrompt.value = false
+  draft.stop()
+  await leave()
+}
+
+function save() {
+  if (isNew || deletedElsewhere.value) {
+    saveAsNew()
+    return
+  }
+
+  const next = editor.snapshot()
+  draft.discard()
+  const updated = store.update(noteId, next)
+  if (!updated) {
+    markDeleted()
+    return
+  }
+  saved.value = cloneContent(updated)
+  updatedAt.value = updated.updatedAt
+  editor.reset(saved.value)
+  justSaved.value = true
+}
+
+async function cancel() {
+  if (isDirty.value) {
+    const ok = await confirm({
+      title: 'Отменить изменения?',
+      message: 'Все несохранённые изменения будут потеряны.',
+      confirmText: 'Отменить изменения',
+      cancelText: 'Продолжить',
+      danger: true,
+    })
+    if (!ok) return
+  }
+  draft.stop()
+  editor.reset(saved.value)
+  await leave()
+}
+
+async function removeNote() {
+  const ok = await confirm({
+    title: 'Удалить заметку?',
+    message: 'Заметка будет удалена без возможности восстановления.',
+    confirmText: 'Удалить',
+    danger: true,
+  })
+  if (!ok) return
+  removedHere = true
+  draft.stop()
+  store.remove(noteId)
+  await leave()
+}
+
+onBeforeRouteLeave(async () => {
+  if (allowLeave || missing || !isDirty.value) return true
+  return confirm({
+    title: 'Уйти без сохранения?',
+    message: 'Несохранённые изменения будут потеряны.',
+    confirmText: 'Уйти',
+    cancelText: 'Остаться',
+    danger: true,
+  })
+})
+
+useEditorHotkeys({
+  undo: editor.undo,
+  redo: editor.redo,
+  save: () => {
+    if (isNew || isDirty.value || deletedElsewhere.value) save()
+  },
+}, {
+  enabled: () => !missing,
+  hasPendingInput: () => editor.hasPendingInput.value,
+})
+
+onBeforeUnmount(editor.dispose)
+</script>
 
 <style lang="scss" scoped>
 .note-page {

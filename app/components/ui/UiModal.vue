@@ -1,3 +1,68 @@
+<template>
+  <Teleport to="body">
+    <Transition name="ui-modal">
+      <div
+        v-if="props.open"
+        class="ui-modal"
+        @pointerdown="onOverlayPointerDown"
+        @click="onOverlayClick"
+      >
+        <div
+          ref="dialog"
+          class="ui-modal__dialog"
+          :role="props.role"
+          aria-modal="true"
+          :aria-labelledby="titleId"
+          :aria-describedby="slots.default ? bodyId : undefined"
+          tabindex="-1"
+        >
+          <header class="ui-modal__header">
+            <h2
+              :id="titleId"
+              class="ui-modal__title"
+            >
+              {{ props.title }}
+            </h2>
+            <button
+              v-if="props.closable"
+              type="button"
+              class="ui-modal__close"
+              aria-label="Закрыть"
+              @click="requestClose"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 5l10 10M15 5L5 15"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </header>
+          <div
+            v-if="slots.default"
+            :id="bodyId"
+            class="ui-modal__body"
+          >
+            <slot />
+          </div>
+          <footer
+            v-if="slots.footer"
+            class="ui-modal__footer"
+          >
+            <slot name="footer" />
+          </footer>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+</template>
+
 <script setup lang="ts">
 import { getFocusable } from '~/utils/focusable'
 import { isTopModal, pushModal, removeModal } from '~/utils/modalStack'
@@ -118,71 +183,6 @@ onMounted(() => {
 
 onBeforeUnmount(deactivate)
 </script>
-
-<template>
-  <Teleport to="body">
-    <Transition name="ui-modal">
-      <div
-        v-if="props.open"
-        class="ui-modal"
-        @pointerdown="onOverlayPointerDown"
-        @click="onOverlayClick"
-      >
-        <div
-          ref="dialog"
-          class="ui-modal__dialog"
-          :role="props.role"
-          aria-modal="true"
-          :aria-labelledby="titleId"
-          :aria-describedby="slots.default ? bodyId : undefined"
-          tabindex="-1"
-        >
-          <header class="ui-modal__header">
-            <h2
-              :id="titleId"
-              class="ui-modal__title"
-            >
-              {{ props.title }}
-            </h2>
-            <button
-              v-if="props.closable"
-              type="button"
-              class="ui-modal__close"
-              aria-label="Закрыть"
-              @click="requestClose"
-            >
-              <svg
-                viewBox="0 0 20 20"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M5 5l10 10M15 5L5 15"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </button>
-          </header>
-          <div
-            v-if="slots.default"
-            :id="bodyId"
-            class="ui-modal__body"
-          >
-            <slot />
-          </div>
-          <footer
-            v-if="slots.footer"
-            class="ui-modal__footer"
-          >
-            <slot name="footer" />
-          </footer>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
-</template>
 
 <style lang="scss" scoped>
 .ui-modal {

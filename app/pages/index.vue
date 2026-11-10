@@ -1,33 +1,3 @@
-<script setup lang="ts">
-import type { Note } from '~/types/note'
-import { useNotesStore } from '~/stores/notes'
-import { displayTitle } from '~/utils/noteContent'
-import { pluralize } from '~/utils/plural'
-
-const store = useNotesStore()
-const confirm = useConfirm()
-
-useHead({ title: 'Заметки' })
-
-const countLabel = computed(() => {
-  const count = store.notes.length
-  return `${count} ${pluralize(count, ['заметка', 'заметки', 'заметок'])}`
-})
-
-async function removeNote(note: Note) {
-  const ok = await confirm({
-    title: 'Удалить заметку?',
-    message: `Заметка «${displayTitle(note.title)}» будет удалена без возможности восстановления.`,
-    confirmText: 'Удалить',
-    danger: true,
-  })
-  if (!ok) return
-  store.remove(note.id)
-  await nextTick()
-  document.querySelector<HTMLElement>('.note-card__link, .notes-page__new, .notes-page .ui-button--primary')?.focus()
-}
-</script>
-
 <template>
   <section class="notes-page">
     <div class="notes-page__head">
@@ -114,6 +84,36 @@ async function removeNote(note: Note) {
     </ul>
   </section>
 </template>
+
+<script setup lang="ts">
+import type { Note } from '~/types/note'
+import { useNotesStore } from '~/stores/notes'
+import { displayTitle } from '~/utils/noteContent'
+import { pluralize } from '~/utils/plural'
+
+const store = useNotesStore()
+const confirm = useConfirm()
+
+useHead({ title: 'Заметки' })
+
+const countLabel = computed(() => {
+  const count = store.notes.length
+  return `${count} ${pluralize(count, ['заметка', 'заметки', 'заметок'])}`
+})
+
+async function removeNote(note: Note) {
+  const ok = await confirm({
+    title: 'Удалить заметку?',
+    message: `Заметка «${displayTitle(note.title)}» будет удалена без возможности восстановления.`,
+    confirmText: 'Удалить',
+    danger: true,
+  })
+  if (!ok) return
+  store.remove(note.id)
+  await nextTick()
+  document.querySelector<HTMLElement>('.note-card__link, .notes-page__new, .notes-page .ui-button--primary')?.focus()
+}
+</script>
 
 <style lang="scss" scoped>
 .notes-page {

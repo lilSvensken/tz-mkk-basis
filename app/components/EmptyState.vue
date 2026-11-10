@@ -1,10 +1,3 @@
-<script setup lang="ts">
-const props = defineProps<{
-  title: string
-  text?: string
-}>()
-</script>
-
 <template>
   <div class="empty-state">
     <svg
@@ -46,6 +39,13 @@ const props = defineProps<{
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+const props = defineProps<{
+  title: string
+  text?: string
+}>()
+</script>
 
 <style lang="scss" scoped>
 .empty-state {

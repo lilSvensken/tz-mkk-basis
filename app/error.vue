@@ -1,13 +1,3 @@
-<script setup lang="ts">
-import type { NuxtError } from '#app'
-
-const props = defineProps<{ error: NuxtError }>()
-
-const notFound = computed(() => props.error.statusCode === 404)
-
-useHead({ title: () => notFound.value ? 'Страница не найдена' : 'Ошибка' })
-</script>
-
 <template>
   <main class="error-page container">
     <EmptyState
@@ -23,6 +13,16 @@ useHead({ title: () => notFound.value ? 'Страница не найдена' :
     </EmptyState>
   </main>
 </template>
+
+<script setup lang="ts">
+import type { NuxtError } from '#app'
+
+const props = defineProps<{ error: NuxtError }>()
+
+const notFound = computed(() => props.error.statusCode === 404)
+
+useHead({ title: () => notFound.value ? 'Страница не найдена' : 'Ошибка' })
+</script>
 
 <style lang="scss" scoped>
 .error-page {

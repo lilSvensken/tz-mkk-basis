@@ -1,3 +1,26 @@
+<template>
+  <div
+    class="ui-input"
+    :class="[`ui-input--${props.size}`, { 'ui-input--plain': props.plain }]"
+  >
+    <label
+      :for="id"
+      class="ui-input__label"
+      :class="{ 'visually-hidden': props.hideLabel }"
+    >{{ props.label }}</label>
+    <input
+      :id="id"
+      ref="input"
+      v-model="model"
+      class="ui-input__field"
+      type="text"
+      autocomplete="off"
+      :placeholder="props.placeholder"
+      v-bind="$attrs"
+    >
+  </div>
+</template>
+
 <script setup lang="ts">
 defineOptions({ inheritAttrs: false })
 
@@ -23,29 +46,6 @@ defineExpose({
   focus: () => input.value?.focus(),
 })
 </script>
-
-<template>
-  <div
-    class="ui-input"
-    :class="[`ui-input--${props.size}`, { 'ui-input--plain': props.plain }]"
-  >
-    <label
-      :for="id"
-      class="ui-input__label"
-      :class="{ 'visually-hidden': props.hideLabel }"
-    >{{ props.label }}</label>
-    <input
-      :id="id"
-      ref="input"
-      v-model="model"
-      class="ui-input__field"
-      type="text"
-      autocomplete="off"
-      :placeholder="props.placeholder"
-      v-bind="$attrs"
-    >
-  </div>
-</template>
 
 <style lang="scss" scoped>
 .ui-input {

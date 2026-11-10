@@ -1,39 +1,3 @@
-<script setup lang="ts">
-import type { TodoItem } from '~/types/note'
-
-const props = defineProps<{
-  todo: TodoItem
-  index: number
-}>()
-
-const emit = defineEmits<{
-  'toggle': []
-  'update:text': [value: string]
-  'commit': []
-  'remove': []
-  'enter': []
-  'removeEmpty': []
-}>()
-
-const input = ref<{ focus: () => void } | null>(null)
-
-function onKeydown(event: KeyboardEvent) {
-  if (event.isComposing) return
-  if (event.key === 'Enter') {
-    event.preventDefault()
-    emit('enter')
-  }
-  else if (event.key === 'Backspace' && props.todo.text === '') {
-    event.preventDefault()
-    emit('removeEmpty')
-  }
-}
-
-defineExpose({
-  focus: () => input.value?.focus(),
-})
-</script>
-
 <template>
   <li
     class="todo-row"
@@ -79,6 +43,42 @@ defineExpose({
     </UiButton>
   </li>
 </template>
+
+<script setup lang="ts">
+import type { TodoItem } from '~/types/note'
+
+const props = defineProps<{
+  todo: TodoItem
+  index: number
+}>()
+
+const emit = defineEmits<{
+  'toggle': []
+  'update:text': [value: string]
+  'commit': []
+  'remove': []
+  'enter': []
+  'removeEmpty': []
+}>()
+
+const input = ref<{ focus: () => void } | null>(null)
+
+function onKeydown(event: KeyboardEvent) {
+  if (event.isComposing) return
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    emit('enter')
+  }
+  else if (event.key === 'Backspace' && props.todo.text === '') {
+    event.preventDefault()
+    emit('removeEmpty')
+  }
+}
+
+defineExpose({
+  focus: () => input.value?.focus(),
+})
+</script>
 
 <style lang="scss" scoped>
 .todo-row {

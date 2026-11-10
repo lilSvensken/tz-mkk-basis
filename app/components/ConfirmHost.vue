@@ -1,14 +1,3 @@
-<script setup lang="ts">
-import { useConfirmState, type ConfirmRequest } from '~/composables/useConfirm'
-
-const { current, settle } = useConfirmState()
-const shown = shallowRef<ConfirmRequest | null>(current.value)
-
-watch(current, (request) => {
-  if (request) shown.value = request
-})
-</script>
-
 <template>
   <UiModal
     :open="current !== null"
@@ -39,3 +28,14 @@ watch(current, (request) => {
     </template>
   </UiModal>
 </template>
+
+<script setup lang="ts">
+import { useConfirmState, type ConfirmRequest } from '~/composables/useConfirm'
+
+const { current, settle } = useConfirmState()
+const shown = shallowRef<ConfirmRequest | null>(current.value)
+
+watch(current, (request) => {
+  if (request) shown.value = request
+})
+</script>

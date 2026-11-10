@@ -1,3 +1,19 @@
+<template>
+  <component
+    :is="props.to ? NuxtLink : 'button'"
+    :to="props.to"
+    :type="props.to ? undefined : props.type"
+    class="ui-button"
+    :class="[
+      `ui-button--${props.variant}`,
+      `ui-button--${props.size}`,
+      { 'ui-button--block': props.block, 'ui-button--icon': props.icon },
+    ]"
+  >
+    <slot />
+  </component>
+</template>
+
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -19,22 +35,6 @@ const props = withDefaults(defineProps<{
 
 const NuxtLink = resolveComponent('NuxtLink')
 </script>
-
-<template>
-  <component
-    :is="props.to ? NuxtLink : 'button'"
-    :to="props.to"
-    :type="props.to ? undefined : props.type"
-    class="ui-button"
-    :class="[
-      `ui-button--${props.variant}`,
-      `ui-button--${props.size}`,
-      { 'ui-button--block': props.block, 'ui-button--icon': props.icon },
-    ]"
-  >
-    <slot />
-  </component>
-</template>
 
 <style lang="scss" scoped>
 .ui-button {

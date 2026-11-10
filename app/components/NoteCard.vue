@@ -1,18 +1,3 @@
-<script setup lang="ts">
-import type { Note } from '~/types/note'
-import { displayTitle } from '~/utils/noteContent'
-
-const PREVIEW_LIMIT = 3
-
-const props = defineProps<{ note: Note }>()
-
-const titleId = useId()
-const untitled = computed(() => props.note.title.trim() === '')
-const preview = computed(() => props.note.todos.slice(0, PREVIEW_LIMIT))
-const hiddenCount = computed(() => Math.max(props.note.todos.length - PREVIEW_LIMIT, 0))
-const doneCount = computed(() => props.note.todos.filter(todo => todo.done).length)
-</script>
-
 <template>
   <article
     class="note-card"
@@ -91,6 +76,21 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
     </div>
   </article>
 </template>
+
+<script setup lang="ts">
+import type { Note } from '~/types/note'
+import { displayTitle } from '~/utils/noteContent'
+
+const PREVIEW_LIMIT = 3
+
+const props = defineProps<{ note: Note }>()
+
+const titleId = useId()
+const untitled = computed(() => props.note.title.trim() === '')
+const preview = computed(() => props.note.todos.slice(0, PREVIEW_LIMIT))
+const hiddenCount = computed(() => Math.max(props.note.todos.length - PREVIEW_LIMIT, 0))
+const doneCount = computed(() => props.note.todos.filter(todo => todo.done).length)
+</script>
 
 <style lang="scss" scoped>
 .note-card {

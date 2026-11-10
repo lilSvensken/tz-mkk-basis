@@ -1,16 +1,3 @@
-<script setup lang="ts">
-const model = defineModel<boolean>({ required: true })
-
-const props = withDefaults(defineProps<{
-  label: string
-  hideLabel?: boolean
-  disabled?: boolean
-}>(), {
-  hideLabel: false,
-  disabled: false,
-})
-</script>
-
 <template>
   <label
     class="ui-checkbox"
@@ -45,6 +32,19 @@ const props = withDefaults(defineProps<{
     >{{ props.label }}</span>
   </label>
 </template>
+
+<script setup lang="ts">
+const model = defineModel<boolean>({ required: true })
+
+const props = withDefaults(defineProps<{
+  label: string
+  hideLabel?: boolean
+  disabled?: boolean
+}>(), {
+  hideLabel: false,
+  disabled: false,
+})
+</script>
 
 <style lang="scss" scoped>
 .ui-checkbox {
