@@ -1,0 +1,54 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm install -g npm@11 --no-audit --no-fund
+
+      - run: npm ci --no-audit --no-fund
+
+      - run: npm run generate
+        env:
+          NUXT_APP_BASE_URL: /${{ github.event.repository.name }}/
+
+      - run: |
+          cp .output/public/index.html .output/public/404.html
+          touch .output/public/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: .output/public
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
