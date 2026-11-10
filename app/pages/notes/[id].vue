@@ -20,7 +20,9 @@ const editor = createNoteEditor(saved.value)
 const content = editor.content
 
 const isDirty = computed(() => JSON.stringify(content) !== JSON.stringify(saved.value))
-const justSaved = ref(false)
+const justCreated = useState<string | null>('note-just-created', () => null)
+const justSaved = ref(justCreated.value === noteId)
+justCreated.value = null
 let allowLeave = false
 
 useHead({
@@ -126,6 +128,7 @@ function saveAsNew() {
   const created = store.create(editor.snapshot())
   draft.stop()
   allowLeave = true
+  justCreated.value = created.id
   router.replace(`/notes/${created.id}`)
 }
 
