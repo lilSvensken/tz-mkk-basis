@@ -120,6 +120,14 @@ onBeforeRouteLeave(async () => {
   })
 })
 
+useEditorHotkeys({
+  undo: editor.undo,
+  redo: editor.redo,
+  save: () => {
+    if (isNew || isDirty.value) save()
+  },
+}, () => !missing)
+
 onBeforeUnmount(editor.dispose)
 </script>
 
@@ -149,17 +157,67 @@ onBeforeUnmount(editor.dispose)
       >
         ← Все заметки
       </NuxtLink>
-      <p
-        class="note-page__status"
-        role="status"
-      >
-        <template v-if="isDirty">
-          Есть несохранённые изменения
-        </template>
-        <template v-else-if="justSaved">
-          Сохранено
-        </template>
-      </p>
+      <div class="note-page__tools">
+        <p
+          class="note-page__status"
+          role="status"
+        >
+          <template v-if="isDirty">
+            Есть несохранённые изменения
+          </template>
+          <template v-else-if="justSaved">
+            Сохранено
+          </template>
+        </p>
+        <UiButton
+          variant="ghost"
+          size="sm"
+          icon
+          aria-label="Отменить действие"
+          title="Отменить действие (Ctrl+Z)"
+          aria-keyshortcuts="Control+Z"
+          :disabled="!editor.canUndo.value"
+          @click="editor.undo"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M7 4L3 8l4 4M3 8h9a5 5 0 010 10H9"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </UiButton>
+        <UiButton
+          variant="ghost"
+          size="sm"
+          icon
+          aria-label="Повторить действие"
+          title="Повторить действие (Ctrl+Shift+Z)"
+          aria-keyshortcuts="Control+Shift+Z"
+          :disabled="!editor.canRedo.value"
+          @click="editor.redo"
+        >
+          <svg
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M13 4l4 4-4 4M17 8H8a5 5 0 000 10h3"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </UiButton>
+      </div>
     </div>
 
     <div class="note-page__card">
@@ -255,8 +313,15 @@ onBeforeUnmount(editor.dispose)
     }
   }
 
+  &__tools {
+    display: flex;
+    gap: $space-1;
+    align-items: center;
+  }
+
   &__status {
     min-height: 1.5em;
+    margin-right: $space-2;
     font-size: 0.875rem;
     color: var(--color-text-muted);
   }
