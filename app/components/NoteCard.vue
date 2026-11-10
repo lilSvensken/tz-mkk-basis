@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Note } from '~/types/note'
+import { displayTitle } from '~/utils/noteContent'
 
 const PREVIEW_LIMIT = 3
 
 const props = defineProps<{ note: Note }>()
 
 const titleId = useId()
+const untitled = computed(() => props.note.title.trim() === '')
 const preview = computed(() => props.note.todos.slice(0, PREVIEW_LIMIT))
 const hiddenCount = computed(() => Math.max(props.note.todos.length - PREVIEW_LIMIT, 0))
 const doneCount = computed(() => props.note.todos.filter(todo => todo.done).length)
@@ -23,8 +25,9 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
       <NuxtLink
         :to="`/notes/${props.note.id}`"
         class="note-card__link"
+        :class="{ 'note-card__link--untitled': untitled }"
       >
-        {{ props.note.title }}
+        {{ displayTitle(props.note.title) }}
       </NuxtLink>
     </h2>
 
@@ -109,6 +112,11 @@ const doneCount = computed(() => props.note.todos.filter(todo => todo.done).leng
     color: var(--color-text);
     text-decoration: none;
     outline: none;
+
+    &--untitled {
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
 
     &::after {
       position: absolute;

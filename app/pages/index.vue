@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Note } from '~/types/note'
 import { useNotesStore } from '~/stores/notes'
+import { displayTitle } from '~/utils/noteContent'
 
 const store = useNotesStore()
 const confirm = useConfirm()
@@ -10,7 +11,7 @@ useHead({ title: 'Заметки' })
 async function removeNote(note: Note) {
   const ok = await confirm({
     title: 'Удалить заметку?',
-    message: `Заметка «${note.title}» будет удалена без возможности восстановления.`,
+    message: `Заметка «${displayTitle(note.title)}» будет удалена без возможности восстановления.`,
     confirmText: 'Удалить',
     danger: true,
   })
@@ -66,7 +67,7 @@ async function removeNote(note: Note) {
             <UiButton
               size="sm"
               variant="ghost"
-              :aria-label="`Удалить заметку «${note.title}»`"
+              :aria-label="`Удалить заметку «${displayTitle(note.title)}»`"
               @click="removeNote(note)"
             >
               Удалить

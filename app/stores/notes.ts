@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Note, NoteContent } from '~/types/note'
 import { createId } from '~/utils/id'
-import { cloneContent } from '~/utils/noteContent'
+import { normalizeContent } from '~/utils/noteContent'
 import { loadNotes, NOTES_STORAGE_KEY, saveNotes } from '~/utils/notesStorage'
 
 export const SAVE_DELAY = 300
@@ -48,7 +48,7 @@ export const useNotesStore = defineStore('notes', () => {
     const now = Date.now()
     notes.value.push({
       id: createId(),
-      ...cloneContent(content),
+      ...normalizeContent(content),
       createdAt: now,
       updatedAt: now,
     })
@@ -59,7 +59,7 @@ export const useNotesStore = defineStore('notes', () => {
   function update(id: string, content: NoteContent): Note | undefined {
     const note = getById(id)
     if (!note) return undefined
-    Object.assign(note, cloneContent(content), { updatedAt: Date.now() })
+    Object.assign(note, normalizeContent(content), { updatedAt: Date.now() })
     scheduleSave()
     return note
   }

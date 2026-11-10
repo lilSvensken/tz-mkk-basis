@@ -2,7 +2,7 @@
 import type { NoteContent } from '~/types/note'
 import { useNotesStore } from '~/stores/notes'
 import { loadDraft, type Draft } from '~/utils/drafts'
-import { cloneContent } from '~/utils/noteContent'
+import { cloneContent, displayTitle } from '~/utils/noteContent'
 import { createNoteEditor } from '~/utils/noteEditor'
 
 const route = useRoute()
@@ -26,7 +26,7 @@ let allowLeave = false
 useHead({
   title: () => {
     if (missing) return 'Заметка не найдена'
-    return isNew ? 'Новая заметка' : content.title || 'Заметка'
+    return isNew && !content.title.trim() ? 'Новая заметка' : displayTitle(content.title)
   },
 })
 

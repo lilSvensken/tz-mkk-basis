@@ -33,6 +33,19 @@ describe('notes store', () => {
     expect(store.notes.map(n => n.id)).toEqual(['n1'])
   })
 
+  it('trims the title and drops empty items on save', () => {
+    const store = useNotesStore()
+    const note = store.create({
+      title: '  ',
+      todos: [{ id: 'a', text: ' ', done: false }, { id: 'b', text: 'Сыр', done: false }],
+    })
+    expect(note.title).toBe('')
+    expect(note.todos.map(t => t.id)).toEqual(['b'])
+
+    store.update(note.id, { title: ' Новое ', todos: [{ id: 'c', text: '', done: true }] })
+    expect(store.getById(note.id)).toMatchObject({ title: 'Новое', todos: [] })
+  })
+
   it('creates a note with id and timestamps', () => {
     vi.setSystemTime(1000)
     const store = useNotesStore()
